@@ -1,6 +1,8 @@
-# Welcome to your Expo app 👋
+# BTGH OS
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile app for discovering community sports and health events, built with Expo (SDK 58), Expo Router, React Native, and TypeScript. Runs on iOS, Android, and web.
+
+> **Sample data only.** There is no backend yet. All events are fictional and live in `src/data/sample-events.ts`; screens show a "Demo data" label. Saved events are kept in memory and reset when the app reloads.
 
 ## Get started
 
@@ -10,47 +12,56 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Start the dev server
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Open the app:
+   - **Phone:** install [Expo Go](https://expo.dev/go) and scan the QR code. Expo Go must support **SDK 58** (the current App Store / Play Store version does). If Expo Go reports a different SDK, update Expo Go.
+   - **Web:** press `w` in the terminal, or open http://localhost:8081.
+   - **Simulator/emulator:** press `i` (iOS, macOS only) or `a` (Android).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Before committing, run:
 
 ```bash
-npm run reset-project
+npx tsc --noEmit   # typecheck
+npx expo lint      # lint
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Use `npx expo install <package>` (not `npm install <package>`) to add dependencies so versions match the SDK.
 
-### Other setup steps
+## Routes
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Files in `src/app/` are screens ([Expo Router](https://docs.expo.dev/router/introduction)).
 
-## Learn more
+| Route | File | Screen |
+| --- | --- | --- |
+| `/` | `src/app/index.tsx` | Home: search, category shortcuts, hero, featured events |
+| `/events` | `src/app/events/index.tsx` | Event listing: search, tabs, Nearby/Date/Event Type filters, save |
+| `/events/[id]` | `src/app/events/[id].tsx` | Event details |
+| `/discover`, `/impact`, `/profile` | `src/app/*.tsx` | "Coming soon" placeholders |
 
-To learn more about developing your project with Expo, look at the following resources:
+- `src/app/_layout.tsx` is the root layout. Tabs are defined in `src/components/app-tabs.tsx` (native tab bar) and `src/components/app-tabs.web.tsx` (web) — keep the two in sync.
+- `src/app/events/_layout.tsx` is a stack inside the Events tab, so details open within the tab with back navigation.
+- The Home search and category shortcuts open `/events` with `?q=` or `?tab=` set.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Not built yet
 
-## Join the community
+Registration, add to calendar, notifications, profile, organizer/guest profiles, and the Athletes, Causes, and Organizations listings. Their buttons show a "coming soon" message or empty state. Event images are grey placeholders.
 
-Join our community of developers creating universal apps.
+## Checking loading, empty, and error states
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+In development, add `?state=loading`, `?state=empty`, or `?state=error` to the Home or Events URL, e.g. http://localhost:8081/events?state=error. Unknown event IDs (e.g. `/events/not-real`) show "Event not found".
+
+## Project layout
+
+```
+src/
+  app/          routes (screens and layouts only)
+  components/   shared UI (EventCard, AppHeader, Screen, SearchBar, Chip, FilterSelect, StatusView, …)
+  constants/    theme colors and spacing (light and dark)
+  data/         fictional sample events
+  hooks/        useTheme, useSampleEvents, useSavedEvents
+```
